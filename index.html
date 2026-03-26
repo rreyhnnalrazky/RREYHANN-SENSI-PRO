@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 Rreyhann Sensi PRO 🔥</title>
+
+<style>
+body {
+  margin:0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
+  text-align:center;
+}
+
+/* CONTAINER */
+.box {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 20px;
+  margin: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* INPUT */
+input {
+  width: 85%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  margin-bottom: 10px;
+  text-align:center;
+}
+
+/* BUTTON */
+button {
+  width: 90%;
+  margin: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-weight: bold;
+  background: linear-gradient(45deg, cyan, blue);
+  color: white;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+/* RESULT */
+.result {
+  margin-top: 20px;
+  padding: 15px;
+  background: #111;
+  border-radius: 10px;
+}
+
+/* HISTORY */
+.history {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+/* LEADERBOARD */
+.leaderboard {
+  margin-top: 20px;
+  text-align:left;
+}
+
+/* NOTIF */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: black;
+  padding: 10px 20px;
+  border-radius: 10px;
+  display:none;
+}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+</head>
+
+<body>
+
+<h1>🔥 Rreyhann Sensi PRO 🔥</h1>
+
+<div class="box">
+
+<input id="username" placeholder="Masukkan nama..." />
+
+<button onclick="generate()">⚡ Generate Normal</button>
+<button onclick="sultan()">🔥 Sultan Mode</button>
+<button onclick="god()">👑 GOD MODE</button>
+<button onclick="copy()">📋 Copy</button>
+
+<div class="result" id="output">Klik tombol untuk mulai...</div>
+
+<div class="history" id="history"></div>
+<div class="leaderboard" id="leaderboard"></div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+// 🔥 CONFIG FIREBASE
+const firebaseConfig = {
+  apiKey: "AIzaSyA-NBT4efmBVnXSARF4kNQ7FB_uYn12qvY",
+  authDomain: "sensi-rreyhann.firebaseapp.com",
+  databaseURL: "https://sensi-rreyhann-default-rtdb.firebaseio.com/",
+  projectId: "sensi-rreyhann",
+  storageBucket: "sensi-rreyhann.firebasestorage.app",
+  messagingSenderId: "145452605443",
+  appId: "1:145452605443:web:e53f71e4c197291b2c2e36"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// SYSTEM
+let last = "";
+let history = JSON.parse(localStorage.getItem("his")) || [];
+
+// RANDOM
+function r(min,max){
+ return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+// NOTIF
+function toast(msg){
+ let t=document.getElementById("toast");
+ t.innerText=msg;
+ t.style.display="block";
+ setTimeout(()=>t.style.display="none",2000);
+}
+
+// GENERATE NORMAL
+function generate(){
+ let user = document.getElementById("username").value;
+ if(!user) return toast("Isi nama dulu!");
+
+ let s={
+  g:r(80,100),
+  r:r(70,100),
+  s2:r(60,90),
+  s4:r(50,80),
+  sn:r(40,70),
+  f:r(50,80)
+ };
+
+ show(user,s,"NORMAL");
+ save(user,s,"normal");
+}
+
+// SULTAN
+function sultan(){
+ let user = document.getElementById("username").value;
+ if(!user) return toast("Isi nama!");
+
+ let s={
+  g:r(95,100),
+  r:r(90,100),
+  s2:r(85,100),
+  s4:r(80,100),
+  sn:r(75,95),
+  f:r(85,100)
+ };
+
+ show(user,s,"SULTAN");
+ save(user,s,"sultan");
+}
+
+// GOD MODE
+function god(){
+ let user = document.getElementById("username").value;
+ if(!user) return toast("Isi nama!");
+
+ let s={
+  g:100,
+  r:100,
+  s2:100,
+  s4:100,
+  sn:95,
+  f:100
+ };
+
+ show(user,s,"GOD 👑");
+ save(user,s,"god");
+}
+
+// TAMPIL
+function show(user,s,mode){
+ last = `${user} | ${mode} | ${s.g}`;
+
+ document.getElementById("output").innerHTML=`
+ <b>${mode}</b><br><br>
+ 👤 ${user}<br>
+ 🎯 ${s.g}<br>
+ 🔴 ${s.r}<br>
+ 🔍 ${s.s2}<br>
+ 🔭 ${s.s4}<br>
+ 🎯 ${s.sn}<br>
+ 👁 ${s.f}
+ `;
+
+ history.push(last);
+ localStorage.setItem("his",JSON.stringify(history));
+ renderHistory();
+}
+
+// COPY
+function copy(){
+ if(!last) return toast("Generate dulu!");
+ navigator.clipboard.writeText(last);
+ toast("Berhasil di-copy!");
+}
+
+// HISTORY
+function renderHistory(){
+ let h=document.getElementById("history");
+ h.innerHTML="<h3>History</h3>"+history.slice(-5).reverse().join("<br>");
+}
+renderHistory();
+
+// SAVE FIREBASE
+function save(user,s,mode){
+ db.ref("sensi").push({
+  user:user,
+  score:s.g,
+  mode:mode
+ });
+}
+
+// LEADERBOARD
+function load(){
+ db.ref("sensi")
+ .orderByChild("score")
+ .limitToLast(5)
+ .on("value",snap=>{
+  let data=[];
+  snap.forEach(c=>data.push(c.val()));
+  data.reverse();
+
+  let html="<h3>🏆 Top Player</h3>";
+  data.forEach((d,i)=>{
+   html+=`#${i+1} ${d.user} (${d.score})<br>`;
+  });
+
+  document.getElementById("leaderboard").innerHTML=html;
+ });
+}
+load();
+
+</script>
+
+</body>
+</html>
